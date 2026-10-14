@@ -15,7 +15,7 @@ A secure passwordless login for Node.js apps: users enter their email and sign i
   <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-2457c5">
 </p>
 
-**Contents:** [Demo](#demo) · [How it works](#how-it-works) · [Features](#features) · [Stack](#stack) · [Prerequisites](#prerequisites) · [Mailtrap setup](#mailtrap-setup) · [Quick start](#quick-start) · [Key integration points](#key-integration-points) · [Failure behavior](#failure-behavior) · [Security design](#security-design) · [Configuration](#configuration) · [Tests](#tests) · [Deploying](#deploying-to-production) · [Links](#links) · [FAQ](#faq)
+**Contents:** [Demo](#demo) · [How it works](#how-it-works) · [Features](#features) · [Stack](#stack) · [Prerequisites](#prerequisites) · [Mailtrap setup](#mailtrap-setup) · [Quick start](#quick-start) · [Key integration points](#key-integration-points) · [Failure behavior](#failure-behavior) · [Security design](#security-design) · [Configuration](#configuration) · [Tests](#tests) · [Deploying](#deploying-to-production) · [FAQ](#faq)
 
 ## Demo
 
@@ -312,46 +312,23 @@ npm start
 - **One instance:** rate limits and the cooldown are stored per database file, so run a single instance or move them to a shared store.
 - **Cleanup:** expired challenges, sessions and old rate-limit rows are pruned on startup and every hour.
 
-## Links
-
-- [Mailtrap Node.js SDK](https://github.com/railsware/mailtrap-nodejs)
-- [Mailtrap sending limits](https://docs.mailtrap.io/email-api-smtp/setup/sending-limits)
-- [Mailtrap](https://mailtrap.io)
-- [Express](https://expressjs.com)
-- [better-sqlite3](https://github.com/WiseLibs/better-sqlite3)
-- [Zod](https://zod.dev)
-
 ## FAQ
 
 ### How do I add email OTP login to an Express app?
 
-1. Accept an email on `POST /login`, and validate and normalize it.
-2. Generate a 6-digit code with `crypto.randomInt(0, 1_000_000)`, or a link token with `crypto.randomBytes(32)`.
-3. Send it through a transactional email API.
-4. After the send succeeds, store an HMAC of it with a 10-minute expiry and an attempts counter.
-5. On verify, compare in constant time, mark it used with a conditional `UPDATE`, create a server-side session, and set an `HttpOnly` cookie.
-
-This repo does exactly that. Start with [`src/auth/requestLogin.ts`](src/auth/requestLogin.ts) and [`src/routes/login.ts`](src/routes/login.ts).
+Accept an email on `POST /login`, validate it, and generate a 6-digit code with `crypto.randomInt` or a link token with `crypto.randomBytes`. Send it through a transactional email API, and only after the send succeeds, store an HMAC of it with a 10-minute expiry and an attempts counter. On verify, compare in constant time, mark it used with a conditional `UPDATE`, then create a server-side session and set an `HttpOnly` cookie. This repo does exactly that in [`src/auth/requestLogin.ts`](src/auth/requestLogin.ts) and [`src/routes/login.ts`](src/routes/login.ts).
 
 ### How should I store one-time login codes securely?
 
-Never in plaintext, and not as a plain SHA-256 either: a million possible codes can be reversed in milliseconds. Use a keyed hash, `HMAC-SHA256(secret, code)`, and keep the key outside the database. Make codes short-lived and single-use, consume them with an atomic conditional update, and keep only one live code per user.
+Never in plaintext, and not as a plain SHA-256 either, because a million possible codes can be reversed in milliseconds. Use a keyed hash, `HMAC-SHA256(secret, code)`, and keep the key outside the database so a leaked database alone is useless. Make codes short-lived and single-use, consume them with an atomic conditional update, and keep only one live code per user.
 
 ### How do I stop attackers from guessing email codes?
 
-- **Cap the guesses:** limit attempts per code, here 5 before it locks, and limit how many new codes an email or IP can request.
-- **Limit verification:** rate limit verification per IP.
-- **Compare in constant time.**
-
-With the limits in this repo an attacker gets roughly 25 guesses per 15 minutes per address out of 1,000,000 possible codes.
+Limit the guesses from every direction. Here each code locks after 5 wrong attempts, each email can request at most 5 new codes every 15 minutes, and each IP can make at most 60 verification attempts in the same window. Codes are compared in constant time, so response timing reveals nothing. Together these limits leave an attacker roughly 25 guesses per 15 minutes against one address, out of 1,000,000 possible codes.
 
 ### How do I make sure login emails arrive quickly and don't land in spam?
 
-- **Send from a verified domain** with SPF, DKIM and DMARC set up.
-- **Use a transactional stream for login emails**, kept separate from marketing so bulk sending can't hurt the reputation of time-critical messages. This repo uses Mailtrap's Transactional stream.
-- **Keep the email simple:** a clear subject, the code on the first line of the plain-text part so it shows in notification previews, and a light HTML part.
-- **Tag each type** (`login-code`, `login-link`) so you can watch delivery and bounces in Mailtrap.
-- **Send synchronously and report failures** rather than queueing silently.
+Send from a domain you have verified with SPF, DKIM and DMARC, and use a transactional stream kept separate from marketing mail, as this repo does with Mailtrap's Transactional stream. Keep the email simple: a clear subject, the code on the first line of the plain-text part so it shows in notification previews, and a light HTML part. Tag each email type with a category such as `login-code` to watch delivery and bounces, and send while the user waits so failures are reported, not silently queued.
 
 ## License
 
