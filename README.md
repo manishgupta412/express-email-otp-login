@@ -132,7 +132,7 @@ The only runtime dependencies are express, better-sqlite3, zod, mailtrap and dot
 ## Quick start
 
 ```bash
-git clone https://github.com/manishgupta412/express-mail-otp-login.git && cd express-mail-otp-login
+git clone https://github.com/manishgupta412/express-email-otp-login.git && cd express-mail-otp-login
 npm install
 cp .env.example .env                      # set MAILTRAP_TOKEN, MAIL_FROM_EMAIL and OTP_SECRET
 node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"   # paste as OTP_SECRET
