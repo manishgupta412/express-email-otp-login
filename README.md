@@ -15,15 +15,59 @@ A secure passwordless login for Node.js apps: users enter their email and sign i
   <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-2457c5">
 </p>
 
-**Contents:** [Demo](#demo) · [How it works](#how-it-works) · [Features](#features) · [Stack](#stack) · [Prerequisites](#prerequisites) · [Mailtrap setup](#mailtrap-setup) · [Quick start](#quick-start) · [Key integration points](#key-integration-points) · [Failure behavior](#failure-behavior) · [Security design](#security-design) · [Configuration](#configuration) · [Tests](#tests) · [Deploying](#deploying-to-production) · [FAQ](#faq)
+## The problem
+
+Passwords are a liability. People reuse them, forget them, and every stored password is one breach away from being cracked. Emailing a one-time code or link removes passwords entirely, but a naive version opens new holes: codes saved in plain text, unlimited guessing of a 6-digit number, links that email scanners use up before the user clicks, and responses that reveal which emails have accounts. Getting passwordless login right means getting a dozen small security details right at once.
+
+## What this repo solves
+
+A small, complete Express app that handles each of those details, ready to read, run and copy into your own project.
+
+| Problem | How this repo handles it |
+| --- | --- |
+| Codes and links leaked from the database | Stored only as HMAC-SHA256 with a server-side key, single use, 10-minute expiry |
+| Guessing a 6-digit code | Locks after 5 wrong attempts, plus rate limits per email and per IP |
+| Email scanners using up magic links | Opening the link only shows a button. Sign-in happens on click. |
+| Revealing who has an account | The same page, status and minimum response time for every email |
+| Login emails arriving late or in spam | Sent through the Mailtrap Email API Transactional stream from a verified domain |
+| Users stuck when something fails | A clear message with a one-click "Send a new code" and a resend timer |
+
+**Contents:** [Demo](#demo) · [Screenshots](#screenshots) · [How it works](#how-it-works) · [Features](#features) · [Stack](#stack) · [Prerequisites](#prerequisites) · [Mailtrap setup](#mailtrap-setup) · [Quick start](#quick-start) · [Key integration points](#key-integration-points) · [Failure behavior](#failure-behavior) · [Security design](#security-design) · [Configuration](#configuration) · [Tests](#tests) · [Deploying](#deploying-to-production) · [FAQ](#faq)
 
 ## Demo
 
-| Sign in                                                                                   | Enter the code                                                                                         | Login email                                                                           |
-| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
-| <img src="docs/demo-login.png" alt="Sign-in page with a choice of code or magic link" width="260"> | <img src="docs/demo-code.png" alt="Check your email page with six code boxes and a resend timer" width="260"> | <img src="docs/demo-email.png" alt="Login email showing a 6-digit code" width="260"> |
+<p align="center">
+  <img src="docs/demo.gif" alt="Signing in: enter an email, choose a 6-digit code, open the email, type the code, and land on the signed-in page" width="400">
+</p>
 
-The screenshots come from a local run. The email is `src/email/templates.ts` rendered with a sample code.
+Signing in with a 6-digit code: enter your email, get the code, type it into the boxes and you're in. Recorded from a local run. The email shown is the app's own template, captured by a test mailer instead of being sent through Mailtrap.
+
+## Screenshots
+
+<table>
+  <tr>
+    <th>Sign in</th>
+    <th>Enter the code</th>
+    <th>Login email</th>
+  </tr>
+  <tr>
+    <td><img src="docs/demo-login.png" alt="Sign-in page with a choice of 6-digit code or magic link" width="260"></td>
+    <td><img src="docs/demo-code.png" alt="Check your email page with six code boxes and a resend timer" width="260"></td>
+    <td><img src="docs/demo-email.png" alt="Login email showing a 6-digit code" width="260"></td>
+  </tr>
+  <tr>
+    <th>Magic link sent</th>
+    <th>Code expired</th>
+    <th>Signed in</th>
+  </tr>
+  <tr>
+    <td><img src="docs/demo-link-sent.png" alt="Check your email page after requesting a magic link, with resend timer" width="260"></td>
+    <td><img src="docs/demo-expired.png" alt="Code expired page with a Send a new code button" width="260"></td>
+    <td><img src="docs/demo-dashboard.png" alt="Signed-in page showing the user's email and a Sign out button" width="260"></td>
+  </tr>
+</table>
+
+The screenshots come from a local run with the placeholder address `you@example.com`.
 
 ## How it works
 
