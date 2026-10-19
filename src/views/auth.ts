@@ -56,8 +56,8 @@ export function loginPage(opts: { email?: string; method?: LoginMethod; error?: 
 
   return layout(
     "Sign in",
-    `${icon("lock")}
-<h1 class="spaced">Sign in</h1>
+    `<h1>Welcome back</h1>
+<p class="lead">Enter your email and we'll send you a way in.</p>
 ${alert("error", opts.error)}
 <form method="post" action="/login" data-method-form>
   <div class="field">
@@ -65,10 +65,10 @@ ${alert("error", opts.error)}
     <input id="email" name="email" type="email" autocomplete="email" placeholder="name@example.com" required autofocus value="${escapeHtml(opts.email ?? "")}"${opts.error ? ' aria-invalid="true"' : ""}>
   </div>
   <fieldset>
-    <legend>How do you want to sign in?</legend>
+    <legend>Sign in with</legend>
     <div class="choices">
-      ${choice("code", "6-digit code", "We email a code you enter here")}
-      ${choice("link", "Magic link", "We email a link you click to sign in")}
+      ${choice("code", "A 6-digit code", "Type it on the next screen")}
+      ${choice("link", "A magic link", "Click it in your inbox")}
     </div>
   </fieldset>
   ${submitButton("Continue", "Sending…", "btn-primary", ` data-label-code="${SEND_LABEL.code}" data-label-link="${SEND_LABEL.link}"`)}

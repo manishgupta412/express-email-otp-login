@@ -26,13 +26,34 @@ const STYLES = `
 }
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;
-  background:var(--bg);color:var(--ink);
+body{margin:0;background:var(--surface);color:var(--ink);
   font:400 16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   -webkit-font-smoothing:antialiased}
-.card{width:100%;max-width:420px;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:16px;
-  padding:36px 32px;box-shadow:var(--shadow)}
-@media (max-width:480px){.card{padding:28px 20px;border-radius:14px}}
+
+/* Split layout: brand panel on the left, the page on the right */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:100vh;min-height:100dvh}
+.panel{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;
+  padding:56px clamp(32px,5vw,72px);background:var(--primary);color:#fff}
+.panel::after{content:"";position:absolute;right:-150px;bottom:-150px;width:440px;height:440px;border-radius:50%;
+  border:58px solid rgba(255,255,255,.07);pointer-events:none}
+.panel h2{font-size:clamp(2rem,3.2vw,2.6rem);line-height:1.1;font-weight:700;letter-spacing:-.025em;margin:0 0 28px;max-width:11em}
+.panel-boxes{display:flex;gap:10px;margin-bottom:34px}
+.panel-boxes span{display:grid;place-items:center;width:52px;height:62px;border-radius:12px;font-size:1.6rem;font-weight:700;
+  background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.35);color:#fff}
+.panel-boxes span.on{background:#fff;border-color:#fff;color:var(--primary)}
+.panel ul{list-style:none;padding:0;margin:0;display:grid;gap:12px;color:#dbe5ff}
+.panel li{display:flex;align-items:center;gap:10px}
+.panel li::before{content:"";flex:none;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.18) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center/12px no-repeat}
+.panel-foot{position:absolute;left:clamp(32px,5vw,72px);bottom:40px;font-size:.8125rem;color:#b9c9f5}
+.pane{display:flex;align-items:center;justify-content:center;padding:48px 32px}
+.pane-inner{width:100%;max-width:400px;min-width:0}
+@media (max-width:860px){
+  .split{grid-template-columns:1fr;min-height:0}
+  .panel{padding:28px 20px}
+  .panel h2{font-size:1.5rem;margin:0}
+  .panel-boxes,.panel ul,.panel-foot,.panel::after{display:none}
+  .pane{align-items:flex-start;padding:32px 20px 48px}
+}
 
 .badge{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;margin-bottom:20px;
   background:var(--primary-soft);color:var(--primary)}
@@ -40,8 +61,7 @@ body{margin:0;min-height:100vh;min-height:100dvh;display:flex;flex-direction:col
 .badge.danger{background:var(--danger-soft);color:var(--danger)}
 .badge.success{background:var(--success-soft);color:var(--success)}
 
-h1{font-size:1.5rem;line-height:1.25;font-weight:650;letter-spacing:-.015em;margin:0 0 8px}
-h1.spaced{margin-bottom:24px}
+h1{font-size:1.85rem;line-height:1.2;font-weight:700;letter-spacing:-.02em;margin:0 0 8px}
 p{margin:0 0 16px}
 .lead{color:var(--muted);margin-bottom:24px}
 .lead strong{color:var(--ink);font-weight:600;overflow-wrap:anywhere}
@@ -54,30 +74,29 @@ a:focus-visible{outline:none;box-shadow:var(--ring);border-radius:4px}
 
 label,legend{display:block;font-size:.875rem;font-weight:600;margin-bottom:6px;padding:0}
 .field{margin-bottom:20px}
-input[type=email],input[type=text]{width:100%;height:46px;padding:0 14px;font:inherit;color:var(--ink);
-  background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;
+input[type=email],input[type=text]{width:100%;height:50px;padding:0 14px;font:inherit;color:var(--ink);
+  background:var(--surface);border:1.5px solid var(--line-strong);border-radius:10px;
   transition:border-color .15s,box-shadow .15s}
 input::placeholder{color:var(--placeholder)}
 input:focus{outline:none;border-color:var(--primary);box-shadow:var(--ring)}
 fieldset{border:0;padding:0;margin:0 0 24px;min-width:0}
 
-.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media (max-width:360px){.choices{grid-template-columns:1fr}}
-.choice{position:relative;display:block;margin:0;padding:14px 14px 13px;border:1px solid var(--line-strong);
-  border-radius:10px;cursor:pointer;font-weight:400;transition:border-color .15s,background-color .15s}
+.choices{display:grid;gap:10px}
+.choice{position:relative;display:block;margin:0;padding:14px 16px 14px 50px;border:1.5px solid var(--line);
+  border-radius:12px;cursor:pointer;font-weight:400;transition:border-color .15s,background-color .15s}
 .choice:hover{border-color:var(--primary)}
 .choice input{position:absolute;opacity:0;pointer-events:none}
-.choice-title{display:block;font-weight:600;font-size:.9375rem;padding-right:24px}
+.choice-title{display:block;font-weight:600;font-size:.9375rem}
 .choice-desc{display:block;font-size:.8125rem;color:var(--muted);margin-top:2px}
-.choice .dot{position:absolute;top:15px;right:14px;width:16px;height:16px;border-radius:50%;
+.choice .dot{position:absolute;top:50%;left:17px;margin-top:-9px;width:18px;height:18px;border-radius:50%;
   border:1.5px solid var(--line-strong);background:var(--surface);transition:all .15s}
-.choice:has(input:checked){border-color:var(--primary);background:var(--primary-soft);box-shadow:inset 0 0 0 1px var(--primary)}
-.choice:has(input:checked) .dot{border-color:var(--primary);background:var(--primary);box-shadow:inset 0 0 0 3px var(--surface)}
+.choice:has(input:checked){border-color:var(--primary);background:var(--primary-soft)}
+.choice:has(input:checked) .dot{border-color:var(--primary);background:var(--primary);box-shadow:inset 0 0 0 4px var(--surface)}
 .choice:has(input:focus-visible){box-shadow:inset 0 0 0 1px var(--primary),var(--ring)}
 
-.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:46px;padding:10px 16px;
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;padding:10px 16px;
   font:inherit;font-size:.9375rem;font-weight:600;line-height:1.3;text-align:center;text-decoration:none;
-  border:1px solid transparent;border-radius:8px;cursor:pointer;
+  border:1px solid transparent;border-radius:10px;cursor:pointer;
   transition:background-color .15s,border-color .15s,color .15s,opacity .15s}
 .btn:focus-visible{outline:none;box-shadow:var(--ring)}
 .btn-primary{background:var(--primary);color:var(--primary-ink)}
@@ -143,9 +162,21 @@ export function layout(title: string, body: string): string {
 <style>${STYLES}</style>
 </head>
 <body>
-<main class="card">
+<div class="split">
+<aside class="panel">
+  <h2>Sign in without a password.</h2>
+  <div class="panel-boxes" aria-hidden="true"><span class="on">4</span><span class="on">8</span><span class="on">2</span><span>9</span><span>1</span><span>3</span></div>
+  <ul>
+    <li>No password to remember or leak</li>
+    <li>Codes and links expire in 10 minutes</li>
+    <li>Each one works only once</li>
+  </ul>
+  <p class="panel-foot">Emails are delivered with Mailtrap</p>
+</aside>
+<main class="pane"><div class="pane-inner">
 ${body}
-</main>
+</div></main>
+</div>
 <script src="/assets/app.js" defer></script>
 </body>
 </html>`;
