@@ -30,28 +30,40 @@ body{margin:0;background:var(--surface);color:var(--ink);
   font:400 16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   -webkit-font-smoothing:antialiased}
 
-/* Split layout: brand panel on the left, the page on the right */
+/* Split layout: illustrated panel on the left, the page on the right */
 .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:100vh;min-height:100dvh}
-.panel{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;
-  padding:56px clamp(32px,5vw,72px);background:var(--primary);color:#fff}
-.panel::after{content:"";position:absolute;right:-150px;bottom:-150px;width:440px;height:440px;border-radius:50%;
-  border:58px solid rgba(255,255,255,.07);pointer-events:none}
-.panel h2{font-size:clamp(2rem,3.2vw,2.6rem);line-height:1.1;font-weight:700;letter-spacing:-.025em;margin:0 0 28px;max-width:11em}
-.panel-boxes{display:flex;gap:10px;margin-bottom:34px}
-.panel-boxes span{display:grid;place-items:center;width:52px;height:62px;border-radius:12px;font-size:1.6rem;font-weight:700;
-  background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.35);color:#fff}
-.panel-boxes span.on{background:#fff;border-color:#fff;color:var(--primary)}
-.panel ul{list-style:none;padding:0;margin:0;display:grid;gap:12px;color:#dbe5ff}
-.panel li{display:flex;align-items:center;gap:10px}
-.panel li::before{content:"";flex:none;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.18) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center/12px no-repeat}
-.panel-foot{position:absolute;left:clamp(32px,5vw,72px);bottom:40px;font-size:.8125rem;color:#b9c9f5}
+.panel{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:32px;padding:56px clamp(32px,5vw,64px);color:#fff;
+  background:radial-gradient(42rem 30rem at 15% 0%,rgba(125,160,255,.45),transparent 60%),
+    radial-gradient(36rem 28rem at 100% 100%,rgba(139,92,246,.55),transparent 60%),
+    linear-gradient(155deg,#1d3fa3 0%,#2457c5 45%,#4338ca 100%)}
+.panel h2{font-size:clamp(1.6rem,2.4vw,1.9rem);line-height:1.15;font-weight:700;letter-spacing:-.02em;margin:0 0 8px}
+.panel-copy p{margin:0;color:#dbe4ff;font-size:.9375rem}
+.flow{flex:1;display:flex;flex-direction:column;justify-content:center;gap:clamp(14px,2.4vh,28px);min-height:0}
+.flow-card{position:relative;width:100%;max-width:330px;padding:16px 18px;background:#fff;color:var(--ink);border-radius:18px;
+  box-shadow:0 30px 60px -20px rgba(10,20,60,.55),0 2px 6px rgba(10,20,60,.15)}
+.flow-card:nth-child(1){transform:rotate(-3deg)}
+.flow-card:nth-child(2){margin-left:clamp(40px,22%,160px);transform:rotate(2deg)}
+.flow-card:nth-child(3){margin-left:clamp(12px,6%,48px);max-width:300px;transform:rotate(-1.5deg)}
+.flow-step{position:absolute;right:-10px;top:-10px;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;
+  background:var(--ink);color:#fff;font-size:.8125rem;font-weight:700}
+.flow-head{display:flex;align-items:center;gap:12px}
+.flow-head b{display:block;font-size:.875rem;line-height:1.3}
+.flow-head small{display:block;color:var(--muted);font-size:.75rem}
+.flow-icon{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#3b6fe0,#4338ca)}
+.flow-icon svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.flow-icon.ok{border-radius:50%;background:var(--success-soft)}
+.flow-icon.ok svg{stroke:var(--success);stroke-width:2.6}
+.flow-code{margin-top:12px;font:800 1.75rem/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.35em}
+.flow-btn{display:inline-grid;place-items:center;margin-top:12px;height:32px;padding:0 22px;border-radius:8px;background:var(--primary);color:#fff;font-size:.8125rem;font-weight:600}
+.panel-badges{display:flex;flex-wrap:wrap;gap:10px}
+.panel-badges span{padding:6px 12px;font-size:.8125rem;color:#e6ecff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:999px}
 .pane{display:flex;align-items:center;justify-content:center;padding:48px 32px}
 .pane-inner{width:100%;max-width:400px;min-width:0}
 @media (max-width:860px){
   .split{grid-template-columns:1fr;min-height:0}
-  .panel{padding:28px 20px}
+  .panel{padding:28px 20px;gap:0}
   .panel h2{font-size:1.5rem;margin:0}
-  .panel-boxes,.panel ul,.panel-foot,.panel::after{display:none}
+  .panel-copy p,.flow,.panel-badges{display:none}
   .pane{align-items:flex-start;padding:32px 20px 48px}
 }
 
@@ -164,14 +176,24 @@ export function layout(title: string, body: string): string {
 <body>
 <div class="split">
 <aside class="panel">
-  <h2>Sign in without a password.</h2>
-  <div class="panel-boxes" aria-hidden="true"><span class="on">4</span><span class="on">8</span><span class="on">2</span><span>9</span><span>1</span><span>3</span></div>
-  <ul>
-    <li>No password to remember or leak</li>
-    <li>Codes and links expire in 10 minutes</li>
-    <li>Each one works only once</li>
-  </ul>
-  <p class="panel-foot">Emails are delivered with Mailtrap</p>
+  <div class="panel-copy">
+    <h2>Sign in without a password.</h2>
+    <p>A code or a magic link, straight to your inbox.</p>
+  </div>
+  <div class="flow" aria-hidden="true">
+    <div class="flow-card"><span class="flow-step">1</span>
+      <div class="flow-head"><span class="flow-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg></span><div><b>482913 is your login code</b><small>Login to you@example.com</small></div></div>
+      <div class="flow-code">482913</div>
+    </div>
+    <div class="flow-card"><span class="flow-step">2</span>
+      <div class="flow-head"><span class="flow-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg></span><div><b>Your magic link</b><small>Login to you@example.com</small></div></div>
+      <span class="flow-btn">Sign in</span>
+    </div>
+    <div class="flow-card"><span class="flow-step">3</span>
+      <div class="flow-head"><span class="flow-icon ok"><svg viewBox="0 0 24 24"><path d="m6 12.5 4 4 8-9"/></svg></span><div><b>You're signed in</b><small>No password needed</small></div></div>
+    </div>
+  </div>
+  <div class="panel-badges"><span>Expires in 10 minutes</span><span>Works once</span><span>No password to leak</span></div>
 </aside>
 <main class="pane"><div class="pane-inner">
 ${body}
