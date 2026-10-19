@@ -32,7 +32,7 @@ A small, complete Express app that handles each of those details, ready to read,
 | Login emails arriving late or in spam | Sent through the Mailtrap Email API Transactional stream from a verified domain |
 | Users stuck when something fails | A clear message with a one-click "Send a new code" and a resend timer |
 
-**Contents:** [Demo](#demo) · [Screenshots](#screenshots) · [How it works](#how-it-works) · [Features](#features) · [Stack](#stack) · [Prerequisites](#prerequisites) · [Mailtrap setup](#mailtrap-setup) · [Quick start](#quick-start) · [Key integration points](#key-integration-points) · [Failure behavior](#failure-behavior) · [Security design](#security-design) · [Configuration](#configuration) · [Tests](#tests) · [Deploying](#deploying-to-production) · [FAQ](#faq)
+**Contents:** [Demo](#demo) · [How it works](#how-it-works) · [Features](#features) · [Stack](#stack) · [Prerequisites](#prerequisites) · [Mailtrap setup](#mailtrap-setup) · [Quick start](#quick-start) · [Screenshots](#screenshots) · [Key integration points](#key-integration-points) · [Failure behavior](#failure-behavior) · [Security design](#security-design) · [Configuration](#configuration) · [Tests](#tests) · [Deploying](#deploying-to-production) · [FAQ](#faq)
 
 ## Demo
 
@@ -41,33 +41,6 @@ A small, complete Express app that handles each of those details, ready to read,
 </p>
 
 Signing in with a 6-digit code: enter your email, get the code, type it into the boxes and you're in. Recorded from a local run. The email shown is the app's own template, captured by a test mailer instead of being sent through Mailtrap.
-
-## Screenshots
-
-<table>
-  <tr>
-    <th>Sign in</th>
-    <th>Enter the code</th>
-    <th>Login email</th>
-  </tr>
-  <tr>
-    <td><img src="docs/demo-login.png" alt="Sign-in page with a choice of 6-digit code or magic link" width="260"></td>
-    <td><img src="docs/demo-code.png" alt="Check your email page with six code boxes and a resend timer" width="260"></td>
-    <td><img src="docs/demo-email.png" alt="Login email showing a 6-digit code" width="260"></td>
-  </tr>
-  <tr>
-    <th>Magic link sent</th>
-    <th>Code expired</th>
-    <th>Signed in</th>
-  </tr>
-  <tr>
-    <td><img src="docs/demo-link-sent.png" alt="Check your email page after requesting a magic link, with resend timer" width="260"></td>
-    <td><img src="docs/demo-expired.png" alt="Code expired page with a Send a new code button" width="260"></td>
-    <td><img src="docs/demo-dashboard.png" alt="Signed-in page showing the user's email and a Sign out button" width="260"></td>
-  </tr>
-</table>
-
-The screenshots come from a local run with the placeholder address `you@example.com`.
 
 ## How it works
 
@@ -185,6 +158,46 @@ npm run dev
 ```
 
 Open http://localhost:3000/login. The database is created at `./data/app.db` on startup and migrated automatically. Open magic links on the same computer that runs the server: `APP_URL` is `localhost` until you deploy.
+
+## Screenshots
+
+All screenshots come from a local run with the placeholder address `you@example.com`.
+
+### Sign in
+
+Enter your email and choose a 6-digit code or a magic link.
+
+<img src="docs/demo-login.png" alt="Sign-in page with a choice of 6-digit code or magic link" width="360">
+
+### Enter the code
+
+Type or paste the code. Resending unlocks when the timer runs out.
+
+<img src="docs/demo-code.png" alt="Check your email page with six code boxes and a resend timer" width="360">
+
+### Login email
+
+The code is in the subject and on the first line, so it shows in notification previews.
+
+<img src="docs/demo-email.png" alt="Login email showing a 6-digit code" width="360">
+
+### Magic link sent
+
+Open the email and click Sign in. You can switch to a code instead.
+
+<img src="docs/demo-link-sent.png" alt="Check your email page after requesting a magic link, with resend timer" width="360">
+
+### Code expired
+
+Expired, reused or locked codes explain what happened and offer a new one.
+
+<img src="docs/demo-expired.png" alt="Code expired page with a Send a new code button" width="360">
+
+### Signed in
+
+The protected page, reachable only with a valid session.
+
+<img src="docs/demo-dashboard.png" alt="Signed-in page showing the user's email and a Sign out button" width="360">
 
 ## Key integration points
 
