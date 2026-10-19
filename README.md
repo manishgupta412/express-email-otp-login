@@ -37,10 +37,10 @@ A small, complete Express app that handles each of those details, ready to read,
 ## Demo
 
 <p align="center">
-  <img src="docs/demo.gif" alt="Signing in: enter an email, choose a 6-digit code, open the email, type the code, and land on the signed-in page" width="400">
+  <img src="docs/demo.gif" alt="Signing in: enter an email, send a 6-digit code, open the gradient-header email, type the code, and land on the signed-in page" width="720">
 </p>
 
-Signing in with a 6-digit code: enter your email, get the code, type it into the boxes and you're in. Recorded from a local run. The email shown is the app's own template, captured by a test mailer instead of being sent through Mailtrap.
+Signing in with a 6-digit code: enter your email, get the code by email, type it into the six boxes and you're in. Recorded from a local run of this code. The email shown is the app's own template from `src/email/templates.ts`, captured by a test mailer instead of being sent through Mailtrap.
 
 ## How it works
 
@@ -94,7 +94,9 @@ The user picks a 6-digit code or a magic link. Only that credential is generated
 - **Server-side sessions.** The cookie holds a random 256-bit id and the database stores only its SHA-256 hash. Cookies are `HttpOnly`, `SameSite=Lax`, and `Secure` on https, and sessions last 7 days.
 - **Redacting logger.** Codes, tokens, links and email bodies never appear in logs, and email addresses are masked.
 - **Polished, accessible UI.**
+  - split layout: an illustrated panel explaining the flow next to every page
   - six-box code entry with paste support and auto-submit
+  - matching login emails with a gradient header, digit boxes for the code and a fallback link
   - loading states and keyboard focus styles
   - reduced-motion support
   - works without JavaScript
@@ -160,10 +162,10 @@ The server writes one JSON line per event. Codes, tokens and links never appear,
 ## Screenshots
 
 <p align="center">
-  <img src="docs/demo-login.png" alt="Sign-in page with a choice of 6-digit code or magic link" width="400">
-  <img src="docs/demo-code.png" alt="Check your email page with six code boxes and a resend timer" width="400">
+  <img src="docs/demo-login.png" alt="Sign-in page: illustrated panel on the left, email field and a choice of 6-digit code or magic link on the right" width="400">
+  <img src="docs/demo-code.png" alt="Check your email page with six code boxes, three digits typed, and resend timers" width="400">
 </p>
-<p align="center">Choose a 6-digit code or a magic link, then type the code from the email.</p>
+<p align="center">Choose a 6-digit code or a magic link, then type the code from the email into the six boxes.</p>
 
 <p align="center">
   <img src="docs/demo-expired.png" alt="Code expired page with a Send a new code button" width="400">
@@ -283,7 +285,7 @@ The limits live in code as named constants: `RATE_LIMITS` in [`src/auth/rateLimi
 
 ```text
 .
-├── docs/                      banner and demo screenshots
+├── docs/                      banner, demo GIF, screenshots, terminal logs, flow diagram
 ├── src/
 │   ├── server.ts              entry point: loads .env, config, database, Mailtrap, starts HTTP
 │   ├── app.ts                 createApp(deps): security headers, routes, error pages
