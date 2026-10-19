@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="910" viewBox="0 0 1500 910" role="img" aria-labelledby="t d">
+  <title id="t">Email to signed in</title>
+  <desc id="d">The browser posts an email to the Express app, which checks rate limits, generates a code or magic link, sends it through the Mailtrap Transactional stream and stores only its HMAC in SQLite. The user then submits the code or opens the link, the app checks and consumes the challenge, and creates a session.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="11" markerHeight="11" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+      <path d="M1 1 9 5 1 9" fill="none" stroke="#232f3e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <style>
+      text { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; fill: #232f3e; }
+      .group { font-size: 22px; }
+      .label { font-size: 18px; text-anchor: middle; }
+      .sub { font-size: 15px; text-anchor: middle; fill: #545b64; }
+      .num { font-size: 20px; font-weight: 700; fill: #fff; text-anchor: middle; }
+      .flow { fill: none; stroke: #232f3e; stroke-width: 2.2; stroke-linejoin: round; marker-end: url(#arrow); }
+      .glyph { fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+      .line { fill: none; stroke: #232f3e; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+  </defs>
+
+  <rect width="1500" height="910" fill="#fff"/>
+
+  <!-- ===== Groups ===== -->
+  <!-- Express app -->
+  <rect x="230" y="30" width="830" height="820" fill="none" stroke="#232f3e" stroke-width="2.5"/>
+  <rect x="230" y="30" width="56" height="56" fill="#232f3e"/>
+  <g class="glyph" transform="translate(242 42)" stroke-width="2.4">
+    <rect x="3" y="4" width="26" height="9" rx="2"/><rect x="3" y="18" width="26" height="9" rx="2"/>
+    <path d="M8 8.5h.01M8 22.5h.01"/>
+  </g>
+  <text class="group" x="304" y="66">Your Express app</text>
+
+  <rect x="262" y="108" width="768" height="236" fill="none" stroke="#545b64" stroke-width="1.6" stroke-dasharray="6 5"/>
+  <text class="label" x="282" y="138" style="text-anchor:start">Request a code or link</text>
+
+  <rect x="262" y="572" width="768" height="248" fill="none" stroke="#545b64" stroke-width="1.6" stroke-dasharray="6 5"/>
+  <text class="label" x="282" y="602" style="text-anchor:start">Verify and sign in</text>
+
+  <!-- Mailtrap -->
+  <rect x="1100" y="108" width="360" height="300" fill="none" stroke="#232f3e" stroke-width="2.5"/>
+  <rect x="1100" y="108" width="56" height="56" fill="#232f3e"/>
+  <path class="glyph" stroke-width="2.4" transform="translate(1110 120)" d="M9 26h20a7 7 0 0 0 .5-14A9.5 9.5 0 0 0 11 10a7.5 7.5 0 0 0-2 16z"/>
+  <text class="group" x="1174" y="144">Mailtrap Email API</text>
+
+  <!-- User's mailbox -->
+  <rect x="1100" y="470" width="360" height="330" fill="none" stroke="#232f3e" stroke-width="2.5"/>
+  <rect x="1100" y="470" width="56" height="56" fill="#232f3e"/>
+  <g class="glyph" stroke-width="2.4" transform="translate(1112 482)">
+    <rect x="2" y="6" width="28" height="20" rx="2.5"/><path d="M3 8l13 9 13-9"/>
+  </g>
+  <text class="group" x="1174" y="506">User's mailbox</text>
+
+  <!-- ===== Outside: browser and user ===== -->
+  <g transform="translate(70 405)">
+    <rect class="line" x="12" y="4" width="66" height="46" rx="4"/>
+    <rect class="line" x="20" y="11" width="50" height="32" rx="1.5"/>
+    <path class="line" d="M2 60h86l-6 9H8z"/>
+  </g>
+  <text class="label" x="115" y="505">Browser</text>
+
+  <g transform="translate(80 640)">
+    <circle class="line" cx="35" cy="20" r="17"/>
+    <path class="line" d="M4 82c0-20 14-32 31-32s31 12 31 32z"/>
+  </g>
+  <text class="label" x="115" y="755">User</text>
+
+  <!-- ===== Icons: request row (y center 225) ===== -->
+  <!-- POST /login -->
+  <rect x="295" y="180" width="90" height="90" fill="#e7157b"/>
+  <g class="glyph" transform="translate(295 180)">
+    <path d="M50 24h14a4 4 0 0 1 4 4v34a4 4 0 0 1-4 4H50"/>
+    <path d="M22 45h32M44 35l10 10-10 10"/>
+  </g>
+  <text class="label" x="340" y="296">POST /login</text>
+  <text class="sub" x="340" y="318">email and method</text>
+
+  <!-- Rate limits -->
+  <rect x="555" y="180" width="90" height="90" fill="#dd344c"/>
+  <g class="glyph" transform="translate(555 180)">
+    <path d="M22 60a24 24 0 1 1 46 0"/>
+    <path d="M45 58l13-16"/>
+    <circle cx="45" cy="58" r="3.5"/>
+    <path d="M27 40l4 3M45 30v5M63 40l-4 3"/>
+  </g>
+  <text class="label" x="600" y="296">Rate limits</text>
+  <text class="sub" x="600" y="318">and 60 s cooldown</text>
+
+  <!-- Generate code or link -->
+  <rect x="835" y="180" width="90" height="90" fill="#ed7100"/>
+  <g class="glyph" transform="translate(835 180)">
+    <circle cx="33" cy="45" r="11"/>
+    <path d="M44 45h26M62 45v10M70 45v8"/>
+  </g>
+  <text class="label" x="880" y="296">Generate code</text>
+  <text class="sub" x="880" y="318">or magic link</text>
+
+  <!-- ===== SQLite (between rows) ===== -->
+  <rect x="835" y="408" width="90" height="90" fill="#c925d1"/>
+  <g class="glyph" transform="translate(835 408)">
+    <ellipse cx="45" cy="27" rx="20" ry="7"/>
+    <path d="M25 27v36c0 4 9 7 20 7s20-3 20-7V27"/>
+    <path d="M25 45c0 4 9 7 20 7s20-3 20-7"/>
+  </g>
+  <text class="label" x="880" y="524">SQLite</text>
+  <text class="sub" x="880" y="546">HMACs only</text>
+
+  <!-- ===== Icons: verify row (y center 690) ===== -->
+  <!-- POST /login/verify or /login/link -->
+  <rect x="295" y="645" width="90" height="90" fill="#8c4fff"/>
+  <g class="glyph" transform="translate(295 645)">
+    <rect x="18" y="32" width="54" height="26" rx="4"/>
+    <path d="M30 45h.01M40 45h.01M50 45h.01M60 40v10"/>
+  </g>
+  <text class="label" x="340" y="761">POST /login/verify</text>
+  <text class="sub" x="340" y="783">or /login/link</text>
+
+  <!-- Check and consume -->
+  <rect x="555" y="645" width="90" height="90" fill="#dd344c"/>
+  <g class="glyph" transform="translate(555 645)">
+    <path d="M45 18l21 8v16c0 14-9 23-21 28-12-5-21-14-21-28V26z"/>
+    <path d="M35 45l7 7 13-14"/>
+  </g>
+  <text class="label" x="600" y="761">Check and consume</text>
+  <text class="sub" x="600" y="783">expiry, attempts, single use</text>
+
+  <!-- Create session -->
+  <rect x="835" y="645" width="90" height="90" fill="#01a88d"/>
+  <g class="glyph" transform="translate(835 645)">
+    <rect x="18" y="26" width="54" height="38" rx="4"/>
+    <circle cx="34" cy="42" r="6"/>
+    <path d="M25 57c2-6 16-6 18 0M50 39h14M50 48h14"/>
+  </g>
+  <text class="label" x="880" y="761">Create session</text>
+  <text class="sub" x="880" y="783">cookie, then /dashboard</text>
+
+  <!-- ===== Mailtrap and inbox ===== -->
+  <rect x="1315" y="180" width="90" height="90" fill="#7aa116"/>
+  <g class="glyph" transform="translate(1315 180)">
+    <rect x="20" y="28" width="50" height="34" rx="3"/>
+    <path d="M21 31l24 17 24-17"/>
+  </g>
+  <text class="label" x="1360" y="296">Transactional</text>
+  <text class="sub" x="1360" y="318">stream</text>
+
+  <g transform="translate(1315 585)">
+    <path d="M10 46l9-24h52l9 24v20a5 5 0 0 1-5 5H15a5 5 0 0 1-5-5z" fill="none" stroke="#ed7100" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M10 46h20l5 9h20l5-9h20" fill="none" stroke="#ed7100" stroke-width="3.5" stroke-linejoin="round"/>
+  </g>
+  <text class="label" x="1360" y="686">Login email</text>
+  <text class="sub" x="1360" y="708">code or magic link</text>
+
+  <!-- ===== Flows ===== -->
+  <!-- 1 browser -> POST /login -->
+  <path class="flow" d="M160 432H202V225H291"/>
+  <!-- 2 POST /login -> rate limits -->
+  <path class="flow" d="M389 225H551"/>
+  <!-- rate limits -> generate -->
+  <path class="flow" d="M649 225H831"/>
+  <!-- 3 generate -> Mailtrap -->
+  <path class="flow" d="M929 225H1311"/>
+  <!-- 4 Mailtrap -> inbox -->
+  <path class="flow" d="M1360 330V580"/>
+  <!-- 5 generate -> SQLite -->
+  <path class="flow" d="M880 330V404"/>
+  <!-- inbox ... user (reads the email) -->
+  <path class="flow" d="M1360 722V872H115V771" stroke-dasharray="7 6"/>
+  <text class="sub" x="700" y="893">Reads the code or opens the link</text>
+  <!-- 6 browser -> verify -->
+  <path class="flow" d="M160 452H216V690H291"/>
+  <!-- verify -> check -->
+  <path class="flow" d="M389 690H551"/>
+  <!-- 7 check <-> SQLite -->
+  <path class="flow" d="M600 641V453H831" marker-start="url(#arrow)"/>
+  <!-- 8 check -> session -->
+  <path class="flow" d="M649 690H831"/>
+
+  <!-- ===== Step numbers ===== -->
+  <g>
+    <circle cx="160" cy="330" r="22" fill="#232f3e"/><text class="num" x="160" y="337">1</text>
+    <circle cx="470" cy="187" r="22" fill="#232f3e"/><text class="num" x="470" y="194">2</text>
+    <circle cx="990" cy="187" r="22" fill="#232f3e"/><text class="num" x="990" y="194">3</text>
+    <circle cx="1410" cy="450" r="22" fill="#232f3e"/><text class="num" x="1410" y="457">4</text>
+    <circle cx="930" cy="367" r="22" fill="#232f3e"/><text class="num" x="930" y="374">5</text>
+    <circle cx="160" cy="580" r="22" fill="#232f3e"/><text class="num" x="160" y="587">6</text>
+    <circle cx="720" cy="415" r="22" fill="#232f3e"/><text class="num" x="720" y="422">7</text>
+    <circle cx="740" cy="652" r="22" fill="#232f3e"/><text class="num" x="740" y="659">8</text>
+  </g>
+</svg>

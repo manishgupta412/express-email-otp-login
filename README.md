@@ -70,40 +70,18 @@ flowchart TB
 
 The user picks a 6-digit code or a magic link. Only that credential is generated, emailed and stored.
 
-```mermaid
-sequenceDiagram
-    actor U as User
-    participant A as Express app
-    participant D as SQLite
-    participant M as Mailtrap (Transactional)
+<p align="center">
+  <img src="docs/flow.svg" alt="Sign-in flow: the browser posts an email, the app checks limits, generates a code or link, sends it through Mailtrap and stores its HMAC in SQLite; the user submits the code or opens the link, the app checks and consumes it, and creates a session" width="100%">
+</p>
 
-    U->>A: POST /login {email, method}
-    A->>A: validate, rate limit, 60 s cooldown
-    alt account exists (or AUTO_SIGNUP=true)
-        A->>M: email with code or link
-        M-->>U: "482913 is your login code" / "Your magic link"
-        A->>D: store HMAC of code or token, expires in 10 min
-    else unknown email
-        A->>A: send nothing, store nothing
-    end
-    A-->>U: same "Check your email" page, padded to 800 ms
-    alt code
-        U->>A: POST /login/verify {email, code}
-    else magic link
-        U->>A: GET /login/link?token=... (shows a button only)
-        U->>A: POST /login/link {token}
-    end
-    A->>D: valid, unused, not expired, under 5 attempts?
-    alt valid
-        A->>D: mark used, create session
-        A-->>U: 303 to /dashboard with session cookie
-    else wrong code
-        A->>D: attempts + 1 (locks at 5)
-        A-->>U: "That code isn't correct. You have N attempts left."
-    else expired, used, locked or replaced
-        A-->>U: clear message and a "Send a new code" button
-    end
-```
+1. The browser posts the email and the chosen method to `POST /login`.
+2. The app checks the per-email and per-IP rate limits and the 60-second resend cooldown. Unknown emails stop here, with the same response.
+3. It generates a 6-digit code or a magic-link token and sends it through the Mailtrap Transactional stream.
+4. Mailtrap delivers the login email to the user's inbox.
+5. Only after a successful send, the app stores the HMAC of the code or token in SQLite, with a 10-minute expiry.
+6. The user types the code (`POST /login/verify`) or opens the link and clicks **Continue signing in** (`POST /login/link`).
+7. The app checks the challenge against SQLite (expiry, attempts, single use) and marks it used in one conditional update.
+8. It creates a session, sets the `HttpOnly` cookie and redirects to `/dashboard`.
 
 ## Features
 
