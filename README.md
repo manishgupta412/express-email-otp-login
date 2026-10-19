@@ -137,6 +137,26 @@ npm run dev
 
 Open http://localhost:3000/login. The database is created at `./data/app.db` on startup and migrated automatically. Open magic links on the same computer that runs the server: `APP_URL` is `localhost` until you deploy.
 
+### What you'll see in the terminal
+
+The server writes one JSON line per event. Codes, tokens and links never appear, and email addresses are masked.
+
+**Server started**
+
+<img src="docs/logs-start.png" alt="Terminal output of npm run dev ending with a server started log line" width="100%">
+
+**Signing in with a code:** the code is emailed, one wrong attempt is rejected (`401`), then the right code signs in and redirects (`303`).
+
+<img src="docs/logs-code.png" alt="Logs for requesting a code, a failed attempt, signing in, opening the dashboard and logging out" width="100%">
+
+**Signing in with a magic link:** opening the link only renders a page. The click signs in, and reusing the link fails with `used`.
+
+<img src="docs/logs-link.png" alt="Logs for requesting a magic link, opening it, signing in and a rejected reuse" width="100%">
+
+**Cooldown, unknown email and a failed send:** a second request within 60 s is blocked (`429`), an unknown email gets the same `200` as a real one, and a Mailtrap error returns `502` without exposing anything secret.
+
+<img src="docs/logs-limits.png" alt="Logs for a request blocked by the resend cooldown, an unknown email, and a failed email send" width="100%">
+
 ## Screenshots
 
 <p align="center">
