@@ -161,43 +161,17 @@ Open http://localhost:3000/login. The database is created at `./data/app.db` on 
 
 ## Screenshots
 
-All screenshots come from a local run with the placeholder address `you@example.com`.
+<p align="center">
+  <img src="docs/demo-login.png" alt="Sign-in page with a choice of 6-digit code or magic link" width="400">
+  <img src="docs/demo-code.png" alt="Check your email page with six code boxes and a resend timer" width="400">
+</p>
+<p align="center">Choose a 6-digit code or a magic link, then type the code from the email.</p>
 
-### Sign in
-
-Enter your email and choose a 6-digit code or a magic link.
-
-<img src="docs/demo-login.png" alt="Sign-in page with a choice of 6-digit code or magic link" width="360">
-
-### Enter the code
-
-Type or paste the code. Resending unlocks when the timer runs out.
-
-<img src="docs/demo-code.png" alt="Check your email page with six code boxes and a resend timer" width="360">
-
-### Login email
-
-The code is in the subject and on the first line, so it shows in notification previews.
-
-<img src="docs/demo-email.png" alt="Login email showing a 6-digit code" width="360">
-
-### Magic link sent
-
-Open the email and click Sign in. You can switch to a code instead.
-
-<img src="docs/demo-link-sent.png" alt="Check your email page after requesting a magic link, with resend timer" width="360">
-
-### Code expired
-
-Expired, reused or locked codes explain what happened and offer a new one.
-
-<img src="docs/demo-expired.png" alt="Code expired page with a Send a new code button" width="360">
-
-### Signed in
-
-The protected page, reachable only with a valid session.
-
-<img src="docs/demo-dashboard.png" alt="Signed-in page showing the user's email and a Sign out button" width="360">
+<p align="center">
+  <img src="docs/demo-expired.png" alt="Code expired page with a Send a new code button" width="400">
+  <img src="docs/demo-dashboard.png" alt="Signed-in page showing the user's email and a Sign out button" width="400">
+</p>
+<p align="center">An expired code offers a new one. A valid code lands on the signed-in page.</p>
 
 ## Key integration points
 
