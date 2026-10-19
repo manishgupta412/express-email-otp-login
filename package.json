@@ -19,9 +19,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/manishgupta412/express-mail-otp-login.git"
+    "url": "git+https://github.com/manishgupta412/express-email-otp-login.git"
   },
-  "homepage": "https://github.com/manishgupta412/express-mail-otp-login#readme",
+  "homepage": "https://github.com/manishgupta412/express-email-otp-login#readme",
   "private": true,
   "type": "module",
   "engines": {
