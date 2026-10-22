@@ -4,7 +4,7 @@
 
 # Passwordless Login with Email OTP and Magic Link in Express (Mailtrap)
 
-A secure passwordless login for Node.js apps: users enter their email and sign in with a 6-digit code or a magic link. Built with Express, TypeScript and SQLite, with hashed single-use codes, expiry, attempt limits and rate limiting, and login emails delivered through the Mailtrap Email API Transactional stream.
+A secure passwordless login for Node.js apps: users enter their email and sign in with a 6-digit code or a magic link. Built with Express, TypeScript and SQLite, with hashed single-use codes, expiry, attempt limits and rate limiting, and login emails delivered through the Mailtrap Email API Transactional stream. Use it as a reference implementation or starter template for email OTP login, magic link login and passwordless authentication in Node.js. The same Mailtrap Email API also has a Bulk stream for marketing mail, which this repo doesn't use.
 
 <p>
   <img alt="Node.js 20+" src="https://img.shields.io/badge/Node.js-20%2B-5fa04e?logo=nodedotjs&logoColor=white">
@@ -32,7 +32,7 @@ A small, complete Express app that handles each of those details, ready to read,
 | Login emails arriving late or in spam | Sent through the Mailtrap Email API Transactional stream from a verified domain |
 | Users stuck when something fails | A clear message with a one-click "Send a new code" and a resend timer |
 
-**Contents:** [Demo](#demo) · [How it works](#how-it-works) · [Features](#features) · [Stack](#stack) · [Prerequisites](#prerequisites) · [Mailtrap setup](#mailtrap-setup) · [Quick start](#quick-start) · [Screenshots](#screenshots) · [Key integration points](#key-integration-points) · [Failure behavior](#failure-behavior) · [Security design](#security-design) · [Configuration](#configuration) · [Tests](#tests) · [Deploying](#deploying-to-production) · [FAQ](#faq)
+**Contents:** [Demo](#demo) · [How it works](#how-it-works) · [Features](#features) · [Stack](#stack) · [Prerequisites](#prerequisites) · [Mailtrap setup](#mailtrap-setup) · [Quick start](#quick-start) · [Screenshots](#screenshots) · [Key integration points](#key-integration-points) · [Failure behavior](#failure-behavior) · [Security design](#security-design) · [Configuration](#configuration) · [Tests](#tests) · [Testing and known limitations](#testing-and-known-limitations) · [Deploying](#deploying-to-production) · [FAQ](#faq)
 
 ## Demo
 
@@ -89,6 +89,7 @@ The user picks a 6-digit code or a magic link. Only that credential is generated
 - **Hashed, single-use secrets.** Codes and tokens are stored only as `HMAC-SHA256(OTP_SECRET, …)`, expire after 10 minutes and are consumed with one conditional `UPDATE`.
 - **Attempt limits.** A code locks after 5 wrong tries, after which even the correct code fails.
 - **Rate limits and cooldown.** Requests are limited to 5 per email and 20 per IP every 15 minutes, and verifications to 60 per IP. There is a 60-second resend cooldown, shown as a live timer on the resend buttons.
+- **Resend replaces the previous code.** Each new code or link invalidates the older one. If emails arrive late or out of order, use the one from the newest email.
 - **No account enumeration.** Known and unknown emails get the same page, status and cooldown. Unknown emails get no email and no stored record.
 - **Scanner-safe magic links.** Opening the link only shows a "Continue signing in" button. Email security scanners that open links can't use them up.
 - **Server-side sessions.** The cookie holds a random 256-bit id and the database stores only its SHA-256 hash. Cookies are `HttpOnly`, `SameSite=Lax`, and `Secure` on https, and sessions last 7 days.
@@ -192,6 +193,15 @@ await client.send({
 
 **Store only after a successful send.** If Mailtrap throws, the user sees "We couldn't send the email, try again" and nothing is written. Only an accepted email creates a challenge, and it replaces any older open one ([`src/auth/requestLogin.ts`](src/auth/requestLogin.ts)).
 
+**Scanner-safe magic links.** A security scanner that opens the link with `GET` or `HEAD` only sees a page. The token is consumed by an explicit `POST` ([`src/routes/login.ts`](src/routes/login.ts)):
+
+```mermaid
+flowchart LR
+    scan([Email scanner or user]) -->|"GET /login/link?token=…"| page["Confirmation page<br/>token not consumed"]
+    page -->|"click Continue signing in"| post["POST /login/link"]
+    post -->|"conditional UPDATE: used_at IS NULL"| session["Token consumed,<br/>session created"]
+```
+
 **Hash with a key, compare in constant time.** A 6-digit code has only a million values, so a plain SHA-256 could be reversed instantly from a leaked database. A keyed HMAC can't be reversed without `OTP_SECRET` ([`src/auth/crypto.ts`](src/auth/crypto.ts), [`src/auth/challenges.ts`](src/auth/challenges.ts)):
 
 ```ts
@@ -204,7 +214,7 @@ if (!safeEqualHex(this.hashCode(email, code), row.code_hash)) {
 }
 ```
 
-**Consume atomically.** Two parallel requests with the same code can't both succeed. Only the one that flips `used_at` from `NULL` gets a session ([`src/auth/challenges.ts`](src/auth/challenges.ts)):
+**Consume atomically.** The conditional update is designed so that two parallel requests with the same code can't both succeed: only the one that flips `used_at` from `NULL` gets a session (a parallel-request test is [planned](#testing-and-known-limitations)) ([`src/auth/challenges.ts`](src/auth/challenges.ts)):
 
 ```sql
 UPDATE login_challenges SET used_at = ?
@@ -231,9 +241,11 @@ What happens when something goes wrong, so you know what to expect.
 | Unknown email (`AUTO_SIGNUP=false`) | The same "Check your email" page as a real account. Nothing is sent or stored. Cooldown and rate limits are tracked anyway. |
 | Requested again within 60 s | "One moment" page (HTTP 429) with a live timer. Nothing is sent. |
 | More than 5 requests per email or 20 per IP in 15 min | "Too many attempts" page (HTTP 429) saying how many minutes to wait. |
-| Wrong code | "That code isn't correct. You have N attempts left." The 5th wrong code locks it, and even the correct code then fails. |
+| Wrong code | "That code isn't correct. You have N attempts left." (HTTP 401) The 5th wrong code locks it, and even the correct code then fails. |
 | Expired, reused or locked code | "Code expired", "Code already used" or "Code locked", each with a "Send a new code" button. |
-| Expired, reused or replaced link | "Link expired", "Link already used" or "Link replaced", each with a "Send a new link" button. |
+| Expired, reused or replaced link | "Link expired", "Link already used" or "Link replaced", each with a "Send a new link" button (HTTP 400). |
+| Code from an older email after a resend | "That code isn't correct" (HTTP 401). Only the newest code is valid, and the attempt counts toward the 5-attempt lock. |
+| Link opened in an in-app browser or on another device | The sign-in happens in the browser where **Continue signing in** is clicked, so the original tab stays signed out. Choose the 6-digit code to sign in on the device you started on. |
 | Email scanner opens the magic link | Nothing happens. `GET` only shows a button, and the token is consumed by `POST`. |
 | Code entered for a link-only request | "No active code". A link request has no code, so there is nothing to guess. |
 | More than 60 verifications per IP in 15 min | HTTP 429 until the window resets. |
@@ -330,6 +342,22 @@ The email layer is replaced by a fake that records each email, and the tests rea
 - **Sessions:** logout, session expiry and the `/dashboard` redirect.
 - **Hardening:** HTML escaping, the cross-origin check and security headers.
 
+### Testing and known limitations
+
+Tests never poll an inbox or sleep. The fake mailer (`FakeMailer` in `tests/helpers.ts`) records every email in memory, and the injectable clock (`FakeClock`, `src/clock.ts`) moves time forward to test expiry and cooldowns.
+
+| Area | Status |
+| --- | --- |
+| Resend replaces the older code or link, expiry, reuse, cooldown | Implemented |
+| Send failure shows an error and stores nothing | Implemented |
+| `GET` on a magic link does not consume it, `POST` does | Implemented |
+| `HEAD` requests and simultaneous confirmation `POST`s | Planned |
+| Parallel code requests and parallel verification of one code | Planned |
+| Delayed or out-of-order email delivery | Planned |
+| Gmail Android in-app browser and links opened on a second device | Planned, tested manually only |
+
+Until the planned concurrency tests pass, treat race safety as a design goal, not a tested guarantee.
+
 ## Deploying to production
 
 ```bash
@@ -360,6 +388,26 @@ Limit the guesses from every direction. Here each code locks after 5 wrong attem
 ### How do I make sure login emails arrive quickly and don't land in spam?
 
 Send from a domain you have verified with SPF, DKIM and DMARC, and use a transactional stream kept separate from marketing mail, as this repo does with Mailtrap's Transactional stream. Keep the email simple: a clear subject, the code on the first line of the plain-text part so it shows in notification previews, and a light HTML part. Tag each email type with a category such as `login-code` to watch delivery and bounces, and send while the user waits so failures are reported, not silently queued.
+
+### Which code is valid if I request a new one and the emails arrive out of order?
+
+Only the newest. Every resend invalidates the previous code or link, so an older email that shows up late is rejected with "Code replaced" or "Link replaced". The resend button shows a 60-second cooldown timer, and codes expire after 10 minutes.
+
+### Why does my magic link say "already used" or do nothing when an email scanner opens it?
+
+Some email security scanners open every link in a message. Here, opening the link only shows a **Continue signing in** button, and the token is consumed by a `POST` when the user clicks it. A scanner that sends `GET` or `HEAD` can't use it up.
+
+### Does a magic link work from Gmail's in-app browser or on another device?
+
+The link opens and signs the user in, but the session belongs to the browser where the button was clicked. If that is Gmail's in-app browser or a second device, the original tab stays signed out. The 6-digit code is the alternative: read it in the email app and type it into the original tab.
+
+### How do I test email OTP and magic link flows without flaky inbox polling?
+
+Inject the mailer and the clock. `createApp` takes both, so tests read the code or link from a fake mailer and advance a fake clock instead of waiting on a real inbox or using `sleep`. See [Testing and known limitations](#testing-and-known-limitations) for what is covered.
+
+### How is this different from passport-magic-login or a hosted passwordless service?
+
+[`passport-magic-login`](https://github.com/mxstbr/passport-magic-login) is a Passport strategy library for magic links. Hosted services such as Auth0 passwordless run the login for you. This repo is a complete, small Express app that you read and copy: both a 6-digit code and a magic link, hashed single-use secrets, rate limits, sessions and email delivery in one codebase, with no Passport and no third-party auth service.
 
 ## License
 
