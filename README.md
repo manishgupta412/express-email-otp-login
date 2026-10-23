@@ -32,7 +32,7 @@ A small, complete Express app that handles each of those details, ready to read,
 | Login emails arriving late or in spam | Sent through the Mailtrap Email API Transactional stream from a verified domain |
 | Users stuck when something fails | A clear message with a one-click "Send a new code" and a resend timer |
 
-**Contents:** [Demo](#demo) · [How it works](#how-it-works) · [Features](#features) · [Stack](#stack) · [Prerequisites](#prerequisites) · [Mailtrap setup](#mailtrap-setup) · [Quick start](#quick-start) · [Screenshots](#screenshots) · [Key integration points](#key-integration-points) · [Failure behavior](#failure-behavior) · [Security design](#security-design) · [Configuration](#configuration) · [Tests](#tests) · [Testing and known limitations](#testing-and-known-limitations) · [Deploying](#deploying-to-production) · [FAQ](#faq)
+**Contents:** [Demo](#demo) · [How it works](#how-it-works) · [Features](#features) · [Stack](#stack) · [Prerequisites](#prerequisites) · [Mailtrap setup](#mailtrap-setup) · [Quick start](#quick-start) · [Screenshots](#screenshots) · [Key integration points](#key-integration-points) · [Failure behavior](#failure-behavior) · [Security design](#security-design) · [Configuration](#configuration) · [Tests](#tests) · [Testing and known limitations](#testing-and-known-limitations) · [Deploying](#deploying-to-production) · [FAQ](#faq) · [Contributing](#contributing)
 
 ## Demo
 
@@ -408,6 +408,10 @@ Inject the mailer and the clock. `createApp` takes both, so tests read the code 
 ### How is this different from passport-magic-login or a hosted passwordless service?
 
 [`passport-magic-login`](https://github.com/mxstbr/passport-magic-login) is a Passport strategy library for magic links. Hosted services such as Auth0 passwordless run the login for you. This repo is a complete, small Express app that you read and copy: both a 6-digit code and a magic link, hashed single-use secrets, rate limits, sessions and email delivery in one codebase, with no Passport and no third-party auth service.
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to set up the project, run the checks and open a pull request.
 
 ## License
 
