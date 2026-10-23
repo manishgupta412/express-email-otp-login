@@ -48,7 +48,7 @@ export function maskEmail(email: string): string {
 }
 
 export function createLogger(
-  sink: (line: string) => void = (line) => process.stdout.write(line + "\n"),
+  sink: (line: string) => void = (line) => process.stdout.write(`${line}\n`),
 ): Logger {
   const write = (level: Level, msg: string, fields?: Fields) => {
     const entry = {

@@ -6,7 +6,7 @@ import type { VerifyResult } from "../auth/challenges.js";
 import { RATE_LIMITS } from "../auth/rateLimit.js";
 import { EmailSchema, ipKey, requestLogin, resendWaitSeconds, type HtmlResult, type RequestLoginDeps } from "../auth/requestLogin.js";
 import { readSessionId, setSessionCookie, type SessionStore } from "../auth/sessions.js";
-import { maskEmail, type Logger } from "../logger.js";
+import { maskEmail } from "../logger.js";
 import {
   checkEmailPage,
   errorPage,

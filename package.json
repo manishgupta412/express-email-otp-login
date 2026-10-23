@@ -33,7 +33,10 @@
     "start": "node dist/server.js",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "user:add": "tsx src/cli/addUser.ts"
+    "user:add": "tsx src/cli/addUser.ts",
+    "lint": "biome lint .",
+    "audit:deps": "npm audit --audit-level=high",
+    "check": "npm run lint && npm run typecheck && npm test && npm run audit:deps"
   },
   "dependencies": {
     "better-sqlite3": "^12.11.1",
@@ -43,6 +46,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.6.2",
     "@types/better-sqlite3": "^9.6.0",
     "@types/express": "^5.0.6",
     "@types/node": "^20.19.43",
